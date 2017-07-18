@@ -1,10 +1,14 @@
+package server;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Sever {
+public class MyClass {
     static ServerSocket serverSocket = null;
     static Socket socket = null;
 
@@ -14,13 +18,12 @@ public class Sever {
             System.out.println("Сервер ждет подключения...");
             socket = serverSocket.accept();
             System.out.println("Клиет подключен!");
-            Scanner scn = new Scanner(socket.getInputStream());
-            PrintWriter pw = new PrintWriter(socket.getOutputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream());
             while (true) {
-                String str = scn.nextLine();
+                String str = in.readUTF();
                 if (str.equals("end")) break;
-                pw.write("echo " + str);
-                pw.flush();
+                out.writeUTF("echo " + str);
             }
         } catch (IOException e) {
             e.printStackTrace();
