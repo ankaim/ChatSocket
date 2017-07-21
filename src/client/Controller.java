@@ -1,6 +1,7 @@
 package client;
 
 import javafx.application.Platform;
+import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -14,7 +15,7 @@ import java.util.ResourceBundle;
 // Добавлю действие на закрытие окна
 // Добавление изменение размера техтАреа
 
-public class Controller {
+public class Controller implements Initializable {
     public TextArea textArea;
     public TextField textField;
 
@@ -22,7 +23,7 @@ public class Controller {
     private DataInputStream in;
     private DataOutputStream out;
 
-
+    @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             socket = new Socket("localhost", 8189);
@@ -32,10 +33,17 @@ public class Controller {
                 try {
                     while (true) {
                         String str = in.readUTF();
+                        if(str.endsWith("end"))break;
                         textArea.appendText(str + "\n");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                }finally {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             t.start();
@@ -47,6 +55,7 @@ public class Controller {
     public void onSendMsg() {
         try {
             out.writeUTF(textField.getText());
+            if(textField.getText().equals("end"))socket.close();
             textField.clear();
             textField.requestFocus();
         } catch (IOException e) {

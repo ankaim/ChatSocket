@@ -7,14 +7,17 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler {
+    private static MyServer myServer;
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(MyServer myServer, Socket socket) {
         try {
+            this.myServer = myServer;
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -23,9 +26,16 @@ public class ClientHandler {
                             String str = in.readUTF();
                             System.out.println("from client: "+ str);
                             if (str.equals("end")) break;
-                            sendMsg("echo " + str);
+                            myServer.broadCastMsg(str);
                         }catch (IOException e){
                             e.printStackTrace();
+                        }finally {
+                            myServer.unsubscribe(this);
+                            try{
+                                socket.close();
+                            }catch (IOException e){
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -36,7 +46,7 @@ public class ClientHandler {
         }
     }
 
-    private void sendMsg(String msg) {
+    public void sendMsg(String msg) {
         try {
             out.writeUTF(msg);
         } catch (IOException e) {
