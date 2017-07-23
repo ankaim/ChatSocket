@@ -7,13 +7,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.PasswordField?>
 <VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="client.Controller">
     <Label text="Чат комната: root">
         <font>
             <Font name="System Bold" size="20.0" />
         </font></Label>
+    <HBox fx:id="upperPanel">
+        <TextField fx:id="loginFild" promptText="Логин"/>
+        <PasswordField fx:id="passwordFild" promptText="Пароль"/>
+        <Button fx:id="btnAuth" text="Авторизоваться" onAction="#onActionClick"/>
+    </HBox>
     <TextArea fx:id="textArea" VBox.vgrow="ALWAYS" editable="false" />
-    <HBox>
+    <HBox visible="false" fx:id="bottonPanel">
         <TextField fx:id="textField" HBox.hgrow="ALWAYS" onAction="#onSendMsg"/>
         <Button text="Send Msg" onAction="#onSendMsg"/>
     </HBox>

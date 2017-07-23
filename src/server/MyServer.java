@@ -6,15 +6,21 @@ import java.net.Socket;
 import java.util.Vector;
 
 public class MyServer {
-    static ServerSocket server = null;
-    static Socket socket = null;
-    final static int port = 8189;
-    Vector<ClientHandler>clients;
+    private static ServerSocket server = null;
+    private static Socket socket = null;
+    private final static int port = 8189;
+    private Vector<ClientHandler>clients;
+    private AuthServic authServic;
+
+    public AuthServic getAuthServic() {
+        return authServic;
+    }
 
     public MyServer() {
         try {
             server = new ServerSocket(port);
             clients = new Vector<>();
+            authServic = new BaseAuthServis();
             while (true) {
                 System.out.println("Сервер ждет подключения...");
                 socket = server.accept();
@@ -31,6 +37,14 @@ public class MyServer {
             }
         }
     }
+    public synchronized boolean isNickBusy(String nick){
+        for(ClientHandler as: clients){
+            if(nick.equals(as.getName())){
+                return true;
+            }
+        }
+        return false;
+    }
     public synchronized void broadCastMsg(String msg){
         for(ClientHandler a: clients){
             a.sendMsg(msg);
@@ -38,5 +52,9 @@ public class MyServer {
     }
     public synchronized void unsubscribe(ClientHandler o){
         clients.remove(o);
+    }
+
+    public synchronized void subscribe(ClientHandler o) {
+        clients.add(o);
     }
 }
