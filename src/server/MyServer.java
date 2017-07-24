@@ -20,7 +20,9 @@ public class MyServer {
         try {
             server = new ServerSocket(port);
             clients = new Vector<>();
-            authServic = new BaseAuthServis();
+            //authServic = new BaseAuthServis();
+            authServic = new DBAuthService();
+            authServic.start();
             while (true) {
                 System.out.println("Сервер ждет подключения...");
                 socket = server.accept();
@@ -35,6 +37,7 @@ public class MyServer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            authServic.stop();
         }
     }
     public synchronized boolean isNickBusy(String nick){

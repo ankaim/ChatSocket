@@ -27,10 +27,20 @@ public class BaseAuthServis implements AuthServic {
     }
 
     @Override
+    public void start() {
+
+    }
+
+    @Override
     public String getNickLoginPass(String login, String pass) {
         for (Entry as : entries) {
             if (login.endsWith(as.login) && pass.equals(as.pass)) return as.nick;
         }
         return null;
+    }
+
+    @Override
+    public void stop() {
+
     }
 }
