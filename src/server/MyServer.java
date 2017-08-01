@@ -60,4 +60,12 @@ public class MyServer {
     public synchronized void subscribe(ClientHandler o) {
         clients.add(o);
     }
+
+    public void privatMsg(String s, String s1) {
+        for(ClientHandler as:clients){
+            if(s.equals(as.getName())){
+                as.sendMsg(s1);
+            }
+        }
+    }
 }

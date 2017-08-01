@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+//Рабочая версия чата. Закончить по последнему уроку второго уровня!
+
 public class Main extends Application {
     public static Stage mainStage;
 

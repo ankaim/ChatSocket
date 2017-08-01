@@ -24,7 +24,7 @@ public class DBAuthService implements AuthServic{
     }
 
     @Override
-    public String getNickLoginPass(String login, String pass) {
+    public String getNickLoginPass(String login, String pass) {//метод получения ника
         try {
             ps.setString(1, login);
             ps.setString(2, pass);

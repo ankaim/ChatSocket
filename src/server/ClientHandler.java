@@ -48,6 +48,13 @@ public class ClientHandler {
                         String str = in.readUTF();
                         System.out.println("from " + name + ": " + str);
                         if (str.equals("/end")) break;
+                        String[] msg = str.split(" ");
+                        name = msg[1];
+                        if (msg[0].equals("/p")) {
+                            if (myServer.isNickBusy(name)) {
+                                myServer.privatMsg(name, msg[2]);
+                            }
+                        }else
                         myServer.broadCastMsg(name + ": " + str);
                     }
                 } catch (IOException e) {
