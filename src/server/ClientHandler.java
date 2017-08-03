@@ -1,6 +1,5 @@
 package server;
 
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,12 +29,12 @@ public class ClientHandler {
                         String str = in.readUTF();
                         if (str.startsWith("/auth")) {
                             String[] parts = str.split("\\s");
-                            String nick = myServer.getAuthServic().getNickLoginPass(parts[1], parts[2]);
+                            String nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                             if (nick != null) {
                                 if (!myServer.isNickBusy(nick)) {
                                     sendMsg("/authok " + nick);
                                     name = nick;
-                                    myServer.broadCastMsg(name + " зашел в чат");
+                                    myServer.broadcastMsg(name + " зашел в чат");
                                     myServer.subscribe(this);
                                     break;
                                 } else sendMsg("Учетная запись уже используется");
@@ -46,22 +45,33 @@ public class ClientHandler {
                     }
                     while (true) {
                         String str = in.readUTF();
-                        System.out.println("from " + name + ": " + str);
-                        if (str.equals("/end")) break;
-                        String[] msg = str.split(" ");
-                        name = msg[1];
-                        if (msg[0].equals("/p")) {
-                            if (myServer.isNickBusy(name)) {
-                                myServer.privatMsg(name, msg[2]);
+                        myServer.hist(name + ": " + str);
+                        // System.out.println("from " + name + ": " + str);
+                        if (str.startsWith("/")) {
+                            if (str.equals("/end")) break;
+                            if (str.startsWith("/w ")) {
+                                String[] tokens = str.split("\\s");
+                                String nick = tokens[1];
+                                String msg = str.substring(4 + nick.length());
+                                myServer.sendMsgToClient(this, nick, msg);
                             }
-                        }else
-                        myServer.broadCastMsg(name + ": " + str);
+                            if (str.startsWith("/changenick ")) {
+                                String newNick = str.split("\\s")[1];
+                                if (myServer.getAuthService().changeNick(this, newNick)) {
+                                    changeNick(newNick);
+                                } else {
+                                    sendMsg("Указанный ник уже кем-то занят");
+                                }
+                            }
+                        } else {
+                            myServer.broadcastMsg(name + ": " + str);
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
                     myServer.unsubscribe(this);
-                    myServer.broadCastMsg(name + " вышел из чата");
+                    myServer.broadcastMsg(name + " вышел из чата");
                     try {
                         socket.close();
                     } catch (IOException e) {
@@ -74,6 +84,13 @@ public class ClientHandler {
         }
     }
 
+    public void changeNick(String newNick) {
+        myServer.broadcastMsg(name + " сменил ник на " + newNick);
+        name = newNick;
+        sendMsg("/yournickis " + newNick);
+        myServer.broadcastClientList();
+    }
+
     public void sendMsg(String msg) {
         try {
             out.writeUTF(msg);
@@ -82,4 +99,3 @@ public class ClientHandler {
         }
     }
 }
-
